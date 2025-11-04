@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Comparativo de Cursos - Análise de Disciplinas</title>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <div class="header-left">
+      <h1>Comparativo entre Cursos</h1>
+      <div id="menu" class="nav-pages"></div>
+  </div>
+  <div id="seletor-cursos" class="seletor-cursos">
+    <h3>Selecione os cursos para comparar:</h3>
+    <div id="checkbox-cursos"></div>
+    <button id="btn-aplicar-comparacao">Aplicar</button>
+  </div>
+</header>
+
+<main>
+  <div id="comparativo" class="comparativo-container"></div>
+</main>
+
+<script src="view_comparativo.js"></script>
+</body>
+</html>

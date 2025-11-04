@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Por Curso - Análise de Disciplinas</title>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>Análise de Disciplinas</h1>
+    <div class="nav-pages" id="menu"></div>
+  </div>
+  <div class="header-right">
+    <button id="uploadBtn" class="btn-upload">📂 Carregar CSV</button>
+    <input type="file" id="csvFile" accept=".csv" style="display:none">
+    <div id="cursos"></div>
+  </div>
+</header>
+
+<main>
+  <div id="sidebar">
+    <div id="disciplinas"></div>
+  </div>
+  <div id="content">
+    <h2>Detalhes da disciplina</h2>
+    <div id="detalhes"></div>
+  </div>
+</main>
+
+<script src="view_individual.js"></script>
+</body>
+</html>

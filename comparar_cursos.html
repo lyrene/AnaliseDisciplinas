@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Comparar Cursos</title>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
+      font-family: sans-serif;
+      background: #f9fafc;
+    }
+
+    header {
+      background: #004080;
+      color: white;
+      padding: 0.5rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+   
+    #painel-selecao label {
+      margin-right: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+#painel-selecao {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  background: #eef2f7;
+  border-bottom: 1px solid #ccc;
+  padding: 0.6rem 1rem;
+  gap: 1rem;
+  font-size: 0.8rem;
+}
+
+#checkbox {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+    main {
+      flex: 1;
+      display: flex;
+      gap: 1rem;
+      padding: 0.8rem;
+      overflow: auto;
+    }
+
+    .quadro-curso {
+      flex: 1;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 0.8rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .titulo-curso {
+      font-weight: bold;
+      font-size: 1rem;
+      color: #004080;
+      margin-bottom: 0.4rem;
+      text-align: center;
+    }
+
+    .semestre-camada {
+      margin-bottom: 1rem;
+    }
+
+    .semestre-titulo {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 0.4rem;
+    }
+
+    .grid-disciplinas {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.5rem;
+    }
+
+    .disciplina-box {
+  background: #eaf0fa;
+  border: 1px solid #cbd6ec;
+  border-radius: 6px;
+  padding: 0.3rem;
+  position: relative;
+  font-size: 0.7rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+  min-height: 80px;
+}
+
+    .disciplina-codigo {
+  position: static;
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: #003366;
+  margin-bottom: 0.2rem;
+}
+
+    .disciplina-ch-total {
+      position: absolute;
+      top: 3px;
+      left: 5px;
+      font-size: 0.65rem;
+      color: #333;
+    }
+
+    .disciplina-ch-pratico {
+      position: absolute;
+      bottom: 3px;
+      left: 5px;
+      font-size: 0.6rem;
+      color: #666;
+    }
+
+    .disciplina-nome {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #002e5c;
+}
+
+.disciplina-equivalencia {
+  font-size: 0.6rem;
+  color: #555;
+  border-bottom: 1px solid #ccc; /* separa visualmente das próximas informações */
+  padding-bottom: 0.15rem;
+  margin-bottom: 0.15rem;
+}
+
+/* Separador de semestres */
+.semestre-camada {
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 0.5rem;
+}
+
+/* Grid ajustável e centrado */
+.grid-disciplinas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* evita expandir tudo */
+  gap: 0.5rem;
+}
+
+/* Blocos de disciplina dimensionados pela carga horária */
+
+/* Tamanhos relativos a ch_total */
+.box-ch30 { width: 90px; }
+.box-ch60 { width: 120px; }
+.box-ch90 { width: 150px; }
+
+/* ---------- reposicionamento dos elementos ---------- */
+
+.disciplina-prereq {
+  font-size: 0.6rem;
+  color: #666;
+  margin-top: 0.1rem;
+}
+
+/* ---------- cores de equivalência ---------- */
+.eq-compartilhada { background: #9fe59b !important; } /* verde mais intenso, porém ainda suave */
+.eq-bidirecional { background: #c4f0c2 !important; }   /* verde suave */
+.eq-unidirecional { background: #fff6b3 !important; }   /* amarelo suave */
+.eq-reversa { background: #f7c5c5 !important; }         /* vermelho suave */
+.eq-amarelo      { background: #fff6b3 !important; } /* amarelo suave */
+.eq-vermelho     { background: #f7c5c5 !important; } /* vermelho suave */
+
+
+/* === bordas semânticas === */
+.eq-indireta { border: 2px dashed #6bb8ff !important; } /* azul: equivalência indireta */
+.eq-multipla { border: 2px solid #b56bff !important; }   /* roxo: múltiplas equivalências */
+
+#legenda {
+  background: #f4f6fa;
+  border-bottom: 1px solid #ccc;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+}
+#legenda ul { list-style: none; padding: 0; margin: 0.2rem 0 0 0; display: flex; flex-wrap: wrap; gap: 1rem; }
+#legenda li { display: flex; align-items: center; gap: 0.3rem; }
+.leg { display: inline-block; width: 18px; height: 12px; border-radius: 3px; border: 1px solid #aaa; }
+.cor-verde { background: #c4f0c2; }
+.cor-verde2 { background: #9fe59b; } /* novo tom mais intenso */
+.cor-amarela { background: #fff6b3; }
+.cor-vermelha { background: #f7c5c5; }
+.borda-azul { border: 2px dashed #6bb8ff; background: white; }
+.borda-roxa { border: 2px solid #b56bff; background: white; }
+
+
+/* === LEGENDA === */
+#legenda {
+  background: #f4f6fa;
+  border-bottom: 1px solid #ccc;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+}
+
+#legenda-itens {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+#legenda ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.leg {
+  display: inline-block;
+  width: 18px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid #aaa;
+}
+
+.cor-verde { background: #c4f0c2; }
+.cor-verde2 { background: #9fe59b; }
+.cor-amarela { background: #fff6b3; }
+.cor-vermelha { background: #f7c5c5; }
+.borda-azul { border: 2px dashed #6bb8ff; background: white; }
+.borda-roxa { border: 2px solid #b56bff; background: white; }
+
+/* === exemplo da disciplina na legenda === */
+#legenda-quadro-exemplo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.disciplina-box.exemplo {
+  transform: scale(0.9);
+  width: 180px;
+  position: relative;
+  box-shadow: none;
+  cursor: default;
+  border: 1px solid #aaa;
+}
+
+.disciplina-box.exemplo * {
+  pointer-events: none;
+}
+
+.legenda-explicacao {
+  font-size: 0.7rem;
+  color: #555;
+  text-align: center;
+  margin: 0;
+}
+
+</style>
+
+</head>
+
+<body>
+  <header>
+    <div class="header-left">
+      <h1>Comparar Cursos</h1>
+      <div id="menu" class="nav-pages"></div>
+  </div>
+  </header>
+
+  <div id="painel-selecao" class="seletor-cursos">
+    <h3>Selecione os cursos para comparar:</h3>
+    <div id="checkbox"></div>
+    <button id="btn-comparar">Aplicar</button>
+  </div>
+
+  <main>
+    <div id="cursoA" class="quadro-curso"></div>
+    <div id="cursoB" class="quadro-curso"></div>
+  </main>
+
+  <div id="legenda">
+    <strong>Legenda:</strong>
+    <div id="legenda-itens">
+      <ul>
+        <li><span class="leg cor-verde"></span> Equivalência direta (A ↔ B)</li>
+        <li><span class="leg cor-verde2"></span> Disciplina presente em ambos os currículos</li>
+        <li><span class="leg cor-amarela"></span> Coberta pelo outro currículo (tem equivalência recebida)</li>
+        <li><span class="leg cor-vermelha"></span> Não coberta (equivalência ausente)</li>
+        <li><span class="leg borda-azul"></span> Relação indireta (nível 2)</li>
+        <li><span class="leg borda-roxa"></span> Equivalência múltipla</li>
+      </ul>
+
+      <div id="legenda-quadro-exemplo">
+        <div class="disciplina-box exemplo">
+          <div class="disciplina-codigo">COD123</div>
+          <div class="disciplina-nome">Nome do Componente</div>
+          <div class="disciplina-equivalencia">Equivalência</div>
+          <div class="disciplina-prereq">Pré-requisito</div>
+          <div class="disciplina-ch-total">60h</div>
+          <div class="disciplina-ch-pratico">20h</div>
+        </div>
+        <p class="legenda-explicacao">
+          Exemplo de disposição dos campos dentro de cada disciplina.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="view_comparar.js"></script>
+</body>
+</html>

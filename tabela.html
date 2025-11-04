@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Tabela Completa - Disciplinas</title>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
+    }
+
+    main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* === Lateral dos filtros === */
+    #painel-filtros {
+      width: 220px;
+      min-width: 200px;
+      background: #f4f6f9;
+      border-right: 1px solid #ccc;
+      padding: 0.8rem;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    #painel-filtros label {
+      display: block;
+      font-size: 0.8rem;
+      color: #333;
+      margin-bottom: 0.2rem;
+      margin-top: 0.5rem;
+    }
+
+    #painel-filtros input {
+      width: 100%;
+      font-size: 0.75rem;
+      padding: 0.25rem;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+    }
+
+    #painel-filtros button {
+      margin-top: 0.6rem;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.8rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #btn-filtrar { background: #004080; color: white; }
+    #btn-filtrar:hover { background: #0066cc; }
+    #btn-limpar { background: #ccc; color: #000; }
+    #btn-limpar:hover { background: #bbb; }
+
+    /* Paginação abaixo dos filtros */
+    #paginacao {
+      margin-top: 0.8rem;
+      text-align: center;
+      font-size: 0.8rem;
+    }
+    #paginacao button {
+      background: #004080;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.2rem 0.5rem;
+      cursor: pointer;
+      margin: 0 0.2rem;
+      font-size: 0.8rem;
+    }
+    #paginacao button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* === Área da tabela === */
+    #area-tabela {
+      flex: 1;
+      overflow: auto;
+      background: white;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 2px 4px;
+      font-size: 0.75rem;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    th {
+      background: #004080;
+      color: white;
+      font-weight: bold;
+      position: sticky;
+      top: 0;
+      line-height: 1.3;
+      padding: 4px;
+      white-space: normal; /* permite quebra de linha no cabeçalho */
+    }
+
+    td {
+      line-height: 1.1;
+      height: 1.2em;
+    }
+
+    /* Larguras específicas */
+    th, td { max-width: 9ch; }
+    th:nth-child(10), td:nth-child(10),
+    th:nth-child(11), td:nth-child(11) {
+      max-width: 50ch; /* Nome da disciplina */
+    }
+
+    tr:nth-child(even) { background: #f8f8f8; }
+    tr:hover { background: #e9f1ff; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="header-left">
+      <h1>Tabela Completa de Disciplinas</h1>
+      <div id="menu" class="nav-pages"></div>
+    </div>
+  </header>
+
+  <main>
+    <aside id="painel-filtros">
+      <label for="f_idcurriculo">ID Currículo ou Curso (105694093=BES, 165191073=BCC 133804382=BTI-L 178736047=BIA)</label>
+      <input id="f_idcurriculo">
+
+      <label for="f_codigo">Código da Disciplina</label>
+      <input id="f_codigo">
+
+      <label for="f_nome">Nome da Disciplina</label>
+      <input id="f_nome">
+
+      <label for="f_semestre">Semestre</label>
+      <input id="f_semestre">
+
+      <label for="f_unidade">Unidade Responsável</label>
+      <input id="f_unidade">
+
+      <label for="f_prereq">Pré-requisito</label>
+      <input id="f_prereq">
+
+      <label for="f_equiv">Equivalência</label>
+      <input id="f_equiv">
+
+      <label for="f_ementa">Ementa</label>
+      <input id="f_ementa">
+
+      <label for="f_tipovinculo">Tipo Vínculo</label>
+      <input id="f_tipovinculo">
+
+      <button id="btn-filtrar">Filtrar</button>
+      <button id="btn-limpar">Limpar</button>
+
+      <div id="paginacao"></div>
+    </aside>
+
+    <section id="area-tabela">
+      <table id="tabela">
+        <thead id="thead"></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script src="view_tabela.js"></script>
+</body>
+</html>
